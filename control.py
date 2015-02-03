@@ -23,15 +23,15 @@ class control(object):
 
 		train = pkl.load(open('formatted/train.pkl'))
 		dev = pkl.load(open('formatted/dev.pkl'))
-		both = train.trees + dev.trees
+		both = train.trees #+ dev.trees
 		self.minibatches = [both[i:i+mbsize] for i in range(0,len(both), mbsize)]
 
-	def run(self, lr, reg, learning_algo, regularize_bias, activation,transform_eye=False, reset_adagrad=None,name='', costfunction=softmax_crossentropy_cost,wordActivations=True):
+	def run(self, lr, reg, learning_algo, regularize_bias, activation,transform_eye=False, reset_adagrad=None,name='', costfunction=softmax_crossentropy_cost,wordActivations=True,gpu=False):
 		s = stepper(lr=lr, reg=reg, learning_algo=learning_algo)
 		if self.unsupervised:
-			model = initRNTN(self.d, self.V, self.V, regularize_bias=regularize_bias, activation=activation, transform_eye=transform_eye, wordActivations=wordActivations)
+			model = initRNTN(self.d, self.V, self.V, regularize_bias=regularize_bias, activation=activation, transform_eye=transform_eye, wordActivations=wordActivations,gpu=gpu)
 		else:
-			model = initRNTN(self.d, self.V, 5, regularize_bias=regularize_bias, activation=activation, transform_eye=transform_eye)
+			model = initRNTN(self.d, self.V, 5, regularize_bias=regularize_bias, activation=activation, transform_eye=transform_eye,gpu=gpu)
 		costs_full = []
 		# try:
 		for ep in range(self.epochs):
@@ -110,8 +110,8 @@ class control(object):
 
 		return accuracies
 if __name__ == '__main__':
-	c = control(epochs=100, unsupervised=True)
-	c1,m1 = c.run(lr=1e-2, reg={'Ws': 1e-4, 'L':1e-4, 'W':1e-3, 'V':1e-3, 'bs':1e-4, 'b':1e-3}, learning_algo='adagrad', regularize_bias=True, activation='tanh',transform_eye=True, reset_adagrad=2, name="reset_2", costfunction=softmax_crossentropy_cost, wordActivations=True)
+	c = control(epochs=100, unsupervised=False)
+	c1,m1 = c.run(lr=1e-2, reg={'Ws': 1e-4, 'L':1e-4, 'W':1e-3, 'V':1e-3, 'bs':1e-4, 'b':1e-3}, learning_algo='adagrad', regularize_bias=True, activation='tanh',transform_eye=True, reset_adagrad=2, name="reset_2", costfunction=softmax_crossentropy_cost, wordActivations=True, gpu=False)
 	# c2,m2 = c.run(lr=1e-2, reg={'Ws': 1e-4, 'L':1e-4, 'W':1e-3, 'V':1e-3, 'bs':1e-4, 'b':1e-3}, learning_algo='adagrad', regularize_bias=True, activation='tanh',transform_eye=True, reset_adagrad=3, name="reset_3", costfunction=softmax_crossentropy_cost, wordActivations=True)
 	# c3,m3 = c.run(lr=1e-2, reg={'Ws': 1e-4, 'L':1e-4, 'W':1e-3, 'V':1e-3, 'bs':1e-4, 'b':1e-3}, learning_algo='adagrad', regularize_bias=True, activation='tanh',transform_eye=True, reset_adagrad=3, name="unsup", costfunction=unsupervised_softmax_cost, wordActivations=True)
 	# c2,m2 = c.run(1e-4,1e-6, 'sgd', True, 0.01, 'tanh')
