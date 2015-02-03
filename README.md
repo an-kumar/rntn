@@ -1,2 +1,2 @@
-# rntn
-RNTN implementation for MetaMind
+# mmRNTN
+RNTN implementation for MetaMind Interview
