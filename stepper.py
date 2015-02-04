@@ -156,14 +156,14 @@ class stepper(object):
 
         # add the two gparam dicts and scale by minibatch size (so that larger minibatches doesn't greatly change anything)
         minibatch_scale = 1/float(len(minibatch)) 
+        for k in gparams:
+            gparams[k] *= minibatch_scale
         for k in reg_gparams:
             # only add the reg gparams to gparams; non reg gparams stay as they were
             gparams[k] += reg_gparams[k]
-        for k in gparams:
-            gparams[k] *= minibatch_scale
 
-        cost = cost + reg_cost
-        cost *= minibatch_scale
+        cost = cost*minibatch_scale + reg_cost
+        # cost *= minibatch_scale
         return cost, gparams
 
 
@@ -252,7 +252,7 @@ if __name__ == '__main__':
     model1 = initRNTN(25, 16582, 5, activation='tanh', wordActivations=False)
     # model2= initRNTN(25, 16582, 5, activation='relu')
 
-    train = pkl.load(open('formatted_new/train.pkl'))
+    train = pkl.load(open('formatted/train.pkl'))
     s1 = stepper()
     # s2 = stepper()
 
